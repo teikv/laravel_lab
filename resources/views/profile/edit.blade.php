@@ -3,7 +3,14 @@
         {{ __('Profile') }}
     </x-slot:title>
 
-    <div class="py-6">
+    <div class="py-6" 
+         x-data="{ status: @js(session('status'))}"
+         x-init="
+            if (['two-factor-authentication-enabled', 'two-factor-authentication-confirmed'].includes(status)) {
+                document.getElementById('two-factor-authentication').scrollIntoView();
+            }
+         "
+    >
         <div class="max-w-5xl mx-auto sm:px-6 lg:px-8 space-y-6">
             @if ($user instanceof \Illuminate\Contracts\Auth\MustVerifyEmail && ! $user->hasVerifiedEmail())
                 <x-panel>
@@ -24,29 +31,34 @@
                             <p class="mt-2 px-2 text-sm text-on-surface-500">
                                 {{ __('A new verification link has been sent to your email address.') }}
                             </p>
-                            @endif
-                        </form>
-                    </x-panel>
-                @endif
+                        @endif
+                    </form>
+                </x-panel>
+            @endif
+            
+            <x-panel :header="__('Profile Information')" :sub-header="__('Update your account\'s profile information and email address.')">
+                <div class="max-w-xl">
+                    @include('profile.partials.update-profile-information-form')
+                </div>
+            </x-panel>
+
+            <x-panel :header="__('Update Password')" :sub-header="__('Ensure your account is using a long, random password to stay secure.')">
+                <div class="max-w-xl">
+                    @include('profile.partials.update-password-form')
+                </div>
+            </x-panel>
+
+            <x-panel id="two-factor-authentication" :header="__('Two Factor Authentication')" :sub-header="__('Add additional security to your account using two factor authentication.')">
+                <div class="max-w-xl">
+                    @include('profile.partials.two-factor-authentication')
+                </div>
+            </x-panel>
                 
-                <x-panel :header="__('Profile Information')" :sub-header="__('Update your account\'s profile information and email address.')">
-                    <div class="max-w-xl">
-                        @include('profile.partials.update-profile-information-form')
-                    </div>
-                </x-panel>
-    
-                <x-panel :header="__('Update Password')" :sub-header="__('Ensure your account is using a long, random password to stay secure.')">
-                    <div class="max-w-xl">
-                        @include('profile.partials.update-password-form')
-                    </div>
-                </x-panel>
-    
-                <x-panel>
-                    <div class="max-w-xl">
-                        @include('profile.partials.delete-user-form')
-                    </div>
-                </x-panel>
-            </div>
+            <x-panel>
+                <div class="max-w-xl">
+                    @include('profile.partials.delete-user-form')
+                </div>
+            </x-panel>
         </div>
-    </x-user-layout>
-    
+    </div>
+</x-user-layout>
